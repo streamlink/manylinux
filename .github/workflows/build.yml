@@ -28,49 +28,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pre_commit:
-    name: Pre-commit checks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      - uses: pre-commit/action@v3.0.1
-
-  build_matrix:
-    needs: pre_commit
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-    steps:
-      - id: matrix
-        name: build matrix
-        shell: python
-        run: |
-          import os
-          import json
-          reduced = [
-              ("x86_64", "ubuntu-24.04", ("manylinux2014", "manylinux_2_28", "manylinux_2_34", "musllinux_1_2")),
-              ("aarch64", "ubuntu-24.04-arm", ("manylinux2014", "manylinux_2_28", "manylinux_2_34", "musllinux_1_2")),
-              ("i686", "ubuntu-24.04", ("manylinux2014", "musllinux_1_2")),
-              ("armv7l", "ubuntu-24.04-arm", ("manylinux_2_31", "musllinux_1_2")),
-          ]
-          expanded = [{"policy": policy, "platform": platform, "runner": runner} for platform, runner, policies in reduced for policy in policies]
-          print(json.dumps(expanded, indent=2))
-          with open(os.environ["GITHUB_OUTPUT"], "at") as f:
-              f.write(f"matrix={json.dumps(expanded)}")
-
   build_manylinux:
     name: ${{ matrix.policy }}_${{ matrix.platform }}
-    needs: build_matrix
     runs-on: ${{ matrix.runner }}
     permissions:
       actions: write # this permission is needed to delete cache
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
+        include:
+          - policy: manylinux_2_28
+            platform: x86_64
+            runner: ubuntu-24.04
+          - policy: manylinux_2_28
+            platform: aarch64
+            runner: ubuntu-24.04-arm
     env:
       POLICY: ${{ matrix.policy }}
       PLATFORM: ${{ matrix.platform }}
@@ -109,16 +81,3 @@ jobs:
         with:
           path: .buildx-cache-${{ matrix.policy }}_${{ matrix.platform }}/*
           key: buildx-cache-${{ matrix.policy }}-${{ matrix.platform }}
-
-      - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'pypa/manylinux'
-        run: ./deploy.sh
-        env:
-          QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-          QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-
-  all_passed:
-    needs: [build_manylinux]
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "All jobs passed"
