@@ -44,7 +44,7 @@ set -euo pipefail
 EOF
 chmod 755 /usr/local/bin/manylinux-interpreters
 
-MANYLINUX_INTERPRETERS_NO_CHECK=1 /usr/local/bin/manylinux-interpreters ensure "$@"
+#MANYLINUX_INTERPRETERS_NO_CHECK=1 /usr/local/bin/manylinux-interpreters ensure "$@"
 
 # Create venv for certifi and pipx
 TOOLS_PATH=/opt/_internal/tools
