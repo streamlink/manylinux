@@ -41,6 +41,9 @@ rm -rf "${AUTOCONF_ROOT}" "${AUTOCONF_ROOT}.tar.gz"
 # Strip what we can
 strip_ /manylinux-rootfs
 
+# Remove unneeded files
+rm -rf /manylinux-rootfs/usr/local/share/{doc/*,info/*,man/man*/*}
+
 # Install
 cp -rlf /manylinux-rootfs/* /
 

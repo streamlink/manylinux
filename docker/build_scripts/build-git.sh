@@ -45,6 +45,9 @@ rm -rf "${GIT_ROOT}" "${GIT_ROOT}.tar.gz"
 # Strip what we can
 strip_ /manylinux-rootfs
 
+# Remove unneeded files
+rm -rf /manylinux-rootfs/usr/local/share/{doc/*,info/*,man/man*/*,gitweb}
+
 # Install
 cp -rlf /manylinux-rootfs/* /
 
