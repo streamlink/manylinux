@@ -2,6 +2,9 @@
 # Helper utilities for build
 
 
+MAKEFLAGS="${MAKEFLAGS:-} -j$(nproc)"
+export MAKEFLAGS
+
 # use all flags used by ubuntu 20.04 for hardening builds, dpkg-buildflags --export
 # other flags mentioned in https://wiki.ubuntu.com/ToolChain/CompilerFlags can't be
 # used because the distros used here are too old
