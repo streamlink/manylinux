@@ -36,7 +36,7 @@ pushd "Python-${CPYTHON_VERSION}"
 PREFIX="/opt/_internal/cpython-${CPYTHON_VERSION}"
 mkdir -p "${PREFIX}/lib"
 CFLAGS_EXTRA=""
-CONFIGURE_ARGS=(--disable-shared --with-ensurepip=no)
+CONFIGURE_ARGS=(--disable-shared --with-ensurepip=no --disable-test-modules)
 
 if [ "${3:-}" == "nogil" ]; then
 	PREFIX="${PREFIX}-nogil"
