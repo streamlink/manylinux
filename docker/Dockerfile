@@ -25,74 +25,65 @@ ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 COPY build_scripts/fixup-mirrors.sh /usr/local/sbin/fixup-mirrors
 
 # setup entrypoint, this will wrap commands with `linux32` with i686 images
-COPY build_scripts/install-entrypoint.sh \
-     build_scripts/update-system-packages.sh \
-     build_scripts/build_utils.sh \
-     /build_scripts/
-
-RUN /build_scripts/install-entrypoint.sh && rm -rf /build_scripts
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    /build_scripts/install-entrypoint.sh
 COPY manylinux-entrypoint /usr/local/bin/manylinux-entrypoint
 ENTRYPOINT ["manylinux-entrypoint"]
 
-COPY build_scripts/install-runtime-packages.sh \
-     build_scripts/update-system-packages.sh \
-     build_scripts/build_utils.sh \
-     /build_scripts/
-RUN manylinux-entrypoint /build_scripts/install-runtime-packages.sh && rm -rf /build_scripts/
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    manylinux-entrypoint /build_scripts/install-runtime-packages.sh
 
-COPY build_scripts/build_utils.sh /build_scripts/
-
-COPY build_scripts/install-autoconf.sh /build_scripts/
-RUN export AUTOCONF_ROOT=autoconf-2.72 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export AUTOCONF_ROOT=autoconf-2.72 && \
     export AUTOCONF_HASH=afb181a76e1ee72832f6581c0eddf8df032b83e2e0239ef79ebedc4467d92d6e && \
     export AUTOCONF_DOWNLOAD_URL=http://ftp.gnu.org/gnu/autoconf && \
     manylinux-entrypoint /build_scripts/install-autoconf.sh
 
-COPY build_scripts/install-automake.sh /build_scripts/
-RUN export AUTOMAKE_ROOT=automake-1.17 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export AUTOMAKE_ROOT=automake-1.17 && \
     export AUTOMAKE_HASH=397767d4db3018dd4440825b60c64258b636eaf6bf99ac8b0897f06c89310acd && \
     export AUTOMAKE_DOWNLOAD_URL=http://ftp.gnu.org/gnu/automake && \
     manylinux-entrypoint /build_scripts/install-automake.sh
 
-COPY build_scripts/install-libtool.sh /build_scripts/
-RUN export LIBTOOL_ROOT=libtool-2.5.3 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export LIBTOOL_ROOT=libtool-2.5.3 && \
     export LIBTOOL_HASH=9322bd8f6bc848fda3e385899dd1934957169652acef716d19d19d24053abb95 && \
     export LIBTOOL_DOWNLOAD_URL=http://ftp.gnu.org/gnu/libtool && \
     manylinux-entrypoint /build_scripts/install-libtool.sh
 
-COPY build_scripts/install-libxcrypt.sh /build_scripts/
-RUN export LIBXCRYPT_VERSION=4.4.38 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export LIBXCRYPT_VERSION=4.4.38 && \
     export LIBXCRYPT_HASH=80304b9c306ea799327f01d9a7549bdb28317789182631f1b54f4511b4206dd6 && \
     export LIBXCRYPT_DOWNLOAD_URL=https://github.com/besser82/libxcrypt/releases/download && \
     manylinux-entrypoint /build_scripts/install-libxcrypt.sh
 
 FROM runtime_base AS build_base
-COPY build_scripts/install-build-packages.sh /build_scripts/
-RUN manylinux-entrypoint /build_scripts/install-build-packages.sh
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    manylinux-entrypoint /build_scripts/install-build-packages.sh
 
 
 FROM build_base AS build_git
-COPY build_scripts/build-curl.sh /build_scripts/
-RUN export CURL_ROOT=curl-8.12.0 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export CURL_ROOT=curl-8.12.0 && \
     export CURL_HASH=b72ec874e403c90462dc3019c5b24cc3cdd895247402bf23893b3b59419353bc && \
     export CURL_DOWNLOAD_URL=https://curl.haxx.se/download && \
     manylinux-entrypoint /build_scripts/build-curl.sh
-COPY build_scripts/build-git.sh /build_scripts/
-RUN export GIT_ROOT=git-2.48.1 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export GIT_ROOT=git-2.48.1 && \
     export GIT_HASH=51b4d03b1e311ba673591210f94f24a4c5781453e1eb188822e3d9cdc04c2212 && \
     export GIT_DOWNLOAD_URL=https://www.kernel.org/pub/software/scm/git && \
     manylinux-entrypoint /build_scripts/build-git.sh
 
 FROM build_base AS build_sqlite3
-COPY build_scripts/build-sqlite3.sh /build_scripts/
-RUN export SQLITE_AUTOCONF_ROOT=sqlite-autoconf-3490000 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export SQLITE_AUTOCONF_ROOT=sqlite-autoconf-3490000 && \
     export SQLITE_AUTOCONF_HASH=4d8bfa0b55e36951f6e5a9fb8c99f3b58990ab785c57b4f84f37d163a0672759 && \
     export SQLITE_AUTOCONF_DOWNLOAD_URL=https://www.sqlite.org/2025 && \
     manylinux-entrypoint /build_scripts/build-sqlite3.sh
 
 FROM build_base AS build_tcl_tk
-COPY build_scripts/build-tcltk.sh /build_scripts/
-RUN export TCL_ROOT=tcl8.6.16 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export TCL_ROOT=tcl8.6.16 && \
     export TCL_HASH=91cb8fa61771c63c262efb553059b7c7ad6757afa5857af6265e4b0bdc2a14a5 && \
     export TCL_DOWNLOAD_URL=https://prdownloads.sourceforge.net/tcl && \
     export TK_ROOT=tk8.6.16 && \
@@ -100,8 +91,8 @@ RUN export TCL_ROOT=tcl8.6.16 && \
     manylinux-entrypoint /build_scripts/build-tcltk.sh
 
 FROM build_base AS build_mpdecimal
-COPY build_scripts/build-mpdecimal.sh /build_scripts/
-RUN export MPDECIMAL_ROOT=mpdecimal-4.0.0 && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    export MPDECIMAL_ROOT=mpdecimal-4.0.0 && \
     export MPDECIMAL_HASH=942445c3245b22730fd41a67a7c5c231d11cb1b9936b9c0f76334fb7d0b4468c && \
     export MPDECIMAL_DOWNLOAD_URL=https://www.bytereef.org/software/mpdecimal/releases && \
     manylinux-entrypoint /build_scripts/build-mpdecimal.sh
@@ -111,9 +102,8 @@ FROM build_base AS build_cpython
 COPY --from=build_tcl_tk /manylinux-buildfs /
 COPY --from=build_mpdecimal /manylinux-buildfs /
 COPY --from=build_sqlite3 /manylinux-buildfs /
-COPY build_scripts/build-openssl.sh /build_scripts/
-COPY build_scripts/build-cpython.sh /build_scripts/
-RUN if command -v apk >/dev/null 2>&1; then ldconfig /; else ldconfig; fi && \
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    if command -v apk >/dev/null 2>&1; then ldconfig /; else ldconfig; fi && \
     export OPENSSL_ROOT=openssl-3.0.15 && \
     export OPENSSL_HASH=23c666d0edf20f14249b3d8f0368acaee9ab585b09e1de82107c66e1f3ec9533 && \
     export OPENSSL_DOWNLOAD_URL=https://github.com/openssl/openssl/releases/download/${OPENSSL_ROOT} && \
@@ -121,8 +111,8 @@ RUN if command -v apk >/dev/null 2>&1; then ldconfig /; else ldconfig; fi && \
 
 
 FROM build_cpython AS build_cpython313
-COPY build_scripts/cpython-pubkey-312-313.txt /build_scripts/cpython-pubkeys.txt
-RUN manylinux-entrypoint /build_scripts/build-cpython.sh 3.13.2
+RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
+    manylinux-entrypoint /build_scripts/build-cpython.sh 3.13.2 cpython-pubkey-312-313.txt
 
 
 FROM runtime_base
