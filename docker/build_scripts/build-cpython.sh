@@ -85,9 +85,11 @@ fi
 ./configure \
 	CFLAGS_NODIST="${MANYLINUX_CFLAGS} ${MANYLINUX_CPPFLAGS} ${CFLAGS_EXTRA}" \
 	LDFLAGS_NODIST="${MANYLINUX_LDFLAGS}" \
-	"--prefix=${PREFIX}" "${CONFIGURE_ARGS[@]}" > /dev/null
-make > /dev/null
-make install > /dev/null
+	"--prefix=${PREFIX}" \
+	"${CONFIGURE_ARGS[@]}"
+make
+make install
+
 popd
 rm -rf "Python-${CPYTHON_VERSION}" "Python-${CPYTHON_VERSION}.tgz" "Python-${CPYTHON_VERSION}.tgz.asc"
 

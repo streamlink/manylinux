@@ -44,9 +44,16 @@ fetch_source "${OPENSSL_ROOT}.tar.gz" "${OPENSSL_DOWNLOAD_URL}"
 check_sha256sum "${OPENSSL_ROOT}.tar.gz" "${OPENSSL_HASH}"
 tar -xzf "${OPENSSL_ROOT}.tar.gz"
 pushd "${OPENSSL_ROOT}"
-./Configure "--prefix=${PREFIX}" "--openssldir=${PREFIX}" --libdir=lib CPPFLAGS="${MANYLINUX_CPPFLAGS}" CFLAGS="${MANYLINUX_CFLAGS}" CXXFLAGS="${MANYLINUX_CXXFLAGS}" LDFLAGS="${MANYLINUX_LDFLAGS} -Wl,-rpath,\$(LIBRPATH)" > /dev/null
-make > /dev/null
-make install_sw > /dev/null
+./Configure \
+	"--prefix=${PREFIX}" \
+	"--openssldir=${PREFIX}" \
+	--libdir=lib \
+	CPPFLAGS="${MANYLINUX_CPPFLAGS}" \
+	CFLAGS="${MANYLINUX_CFLAGS}" \
+	CXXFLAGS="${MANYLINUX_CXXFLAGS}" \
+	LDFLAGS="${MANYLINUX_LDFLAGS} -Wl,-rpath,\$(LIBRPATH)"
+make
+make install_sw
 popd
 rm -rf "${OPENSSL_ROOT}" "${OPENSSL_ROOT}.tar.gz"
 

@@ -75,9 +75,14 @@ function check_sha256sum {
 
 # shellcheck disable=SC2120 # optional arguments
 function do_standard_install {
-	./configure "$@" CPPFLAGS="${MANYLINUX_CPPFLAGS}" CFLAGS="${MANYLINUX_CFLAGS}" "CXXFLAGS=${MANYLINUX_CXXFLAGS}" LDFLAGS="${MANYLINUX_LDFLAGS}" > /dev/null
-	make > /dev/null
-	make install > /dev/null
+	./configure \
+		"$@" \
+		CPPFLAGS="${MANYLINUX_CPPFLAGS}" \
+		CFLAGS="${MANYLINUX_CFLAGS}" \
+		CXXFLAGS="${MANYLINUX_CXXFLAGS}" \
+		LDFLAGS="${MANYLINUX_LDFLAGS}"
+	make
+	make install
 }
 
 function strip_ {
