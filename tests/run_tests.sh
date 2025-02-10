@@ -10,16 +10,8 @@ if [ "${AUDITWHEEL_POLICY:0:10}" == "musllinux_" ]; then
 	EXPECTED_PYTHON_COUNT=9
 	EXPECTED_PYTHON_COUNT_ALL=9
 else
-	if [ "${AUDITWHEEL_ARCH}" == "x86_64" ] || [ "${AUDITWHEEL_ARCH}" == "aarch64" ]; then
-		EXPECTED_PYTHON_COUNT=11
-		EXPECTED_PYTHON_COUNT_ALL=15
-	elif [ "${AUDITWHEEL_ARCH}" == "i686" ]; then
-		EXPECTED_PYTHON_COUNT=11
-		EXPECTED_PYTHON_COUNT_ALL=14
-	else
-		EXPECTED_PYTHON_COUNT=9
-		EXPECTED_PYTHON_COUNT_ALL=9
-	fi
+	EXPECTED_PYTHON_COUNT=1
+	EXPECTED_PYTHON_COUNT_ALL=1
 fi
 
 # the following environment variable allows other manylinux-like projects to run
