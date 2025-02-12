@@ -99,6 +99,7 @@ RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
 
 
 FROM build_base AS build_cpython
+COPY --from=ghcr.io/sigstore/cosign/cosign:v2.4.2 /ko-app/cosign /usr/local/bin/cosign
 COPY --from=build_tcl_tk /manylinux-buildfs /
 COPY --from=build_mpdecimal /manylinux-buildfs /
 COPY --from=build_sqlite3 /manylinux-buildfs /
@@ -112,7 +113,7 @@ RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
 
 FROM build_cpython AS build_cpython313
 RUN --mount=type=bind,target=/build_scripts,source=build_scripts \
-    manylinux-entrypoint /build_scripts/build-cpython.sh 3.13.2 cpython-pubkey-312-313.txt
+    manylinux-entrypoint /build_scripts/build-cpython.sh thomas@python.org https://accounts.google.com 3.13.2
 
 
 FROM runtime_base
